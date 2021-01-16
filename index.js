@@ -4,7 +4,17 @@ const say = new Say('darwin');
 const KIDS = require('./kids.json');
 const ACTIVITIES = require('./activities.json');
 
-(async function chooseActivities(kids, activities) {
+(async function letsPlayActivities() {
+    console.log('\n');
+    await countdown(10);
+    await chooseActivities([...KIDS], Object.keys(ACTIVITIES));
+    await wait(10);
+    await speak('Time to clean up your activity and get ready for the next one!');
+    await wait(2);
+    return letsPlayActivities();
+})();
+
+async function chooseActivities(kids, activities) {
     if (!kids.length) return;
 
     // Pick a random activity
@@ -27,7 +37,17 @@ const ACTIVITIES = require('./activities.json');
 
     // Continue with the remaining kids/activities
     return chooseActivities(kids, activities);
-})([...KIDS], Object.keys(ACTIVITIES));
+}
+
+async function countdown(i) {
+    if (i <= 0) return;
+    await speak(`${i}`);
+    return countdown(i - 1);
+}
+
+function wait(minutes) {
+    return new Promise(resolve => setTimeout(resolve, minutes * 60 * 1000));
+}
 
 function pickRandom(array) {
     const i = random(0, array.length - 1);
@@ -41,13 +61,15 @@ function random(min, max) {
 function oxfordComma([first, ...rest]) {
     if (!rest.length) return first;
     if (rest.length === 1) return [first, ...rest].join(' and ');
-    const prefix = [first, ...rest.slice(0, rest.length - 1)].join(', ');
-    return [prefix, ...rest.slice(-1)].join(', and ');
+    const last = rest.pop();
+    return `${[first, ...rest].join(', ')}, and ${last}`;
 }
 
 function speak(text) {
+    // Speak the correct pronunciation
+    const corrected = text.split('Vella').join('Vaya').split('Brynn').join('Brinn');
     return new Promise((resolve, reject) => {
-        say.speak(text, 'Samantha', 1.25, err => {
+        say.speak(corrected, 'Samantha', 1.25, err => {
             if (err) reject(err);
             resolve();
         })
