@@ -5,10 +5,10 @@ const KIDS = require('./kids.json');
 const ACTIVITIES = require('./activities.json');
 
 (async function letsPlayActivities() {
-    console.log('\n');
+    console.log(`${new Date()}`);
     await countdown(10);
     await chooseActivities([...KIDS], Object.keys(ACTIVITIES));
-    await wait(10);
+    await wait(15);
     await speak('Time to clean up your activity and get ready for the next one!');
     await wait(2);
     return letsPlayActivities();
